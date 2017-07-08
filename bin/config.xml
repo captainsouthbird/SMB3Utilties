@@ -1,0 +1,39 @@
+<config>
+	<!-- 	game: Current game project folder; note that the editor will change to this directory -->
+	<game value="SMB3" />
+
+	<!-- 	filebase: Base name of root assembly file and output (e.g. "smb3" for "smb3.asm", "smb3.nes", etc.) -->
+	<filebase value="smb3" />
+
+	<!-- 	build: Path to assembler; if using a relative path, remember to be relative to your "game" directory -->
+	<build value="../nesasm" />
+
+	<!--	builderror: How to check for failure of assembler:
+
+		* returncode: Checks for a non-zero return code (ideal)
+		* texterror: Look for "error" substring in text (nesasm doesn't use a return code and thus needs this)
+
+	-->
+	<builderr value="texterror" />
+
+	<!-- 	coretimeout: Milliseconds until assuming the 6502 core has frozen (e.g. 1000 = 1 second) 
+		This value should be generous but not too excessive.  Understand that the 6502 core
+		is run as fast as possible (i.e. not at NES speed) so if it takes a second or two to load
+		an SMB3 map on a native NES, it ought to be multitudes faster on your PC.  But latencies
+		or hiccups from the OS might cause delays so you do want to allow a little bit of time
+		for execution to complete.  This value is not guarenteed to be precise down to a 
+		millisecond either, but that really should be no concern.  
+	-->
+	<coretimeout value="1500" />
+
+	<!--	levelrangecheckhigh: The level loading code will halt if a write is detected in the memory
+		range of $7A50 to this value.  The default $798A is the the last value before junction 
+		values.  This should be a fairly safe setting. 
+
+		You can set this to something lower or anything below $7A50 to effectively disable this check
+		in case it gets in the way of a mod, but be careful in case a generator is writing out of
+		bounds and corrupting the game state!
+	-->
+	<levelrangecheckhigh value="0x798A" />
+</config>
+

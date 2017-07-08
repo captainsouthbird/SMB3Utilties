@@ -11,21 +11,21 @@ The following lines in config.xml are what you are most interested in:
 
 ------
 
-"<game />" should point to where your project lives. Remember that the editor will internally change to this directory!
+"game" should point to where your project lives. Remember that the editor will internally change to this directory!
 
-<game value="C:\Users\Whatever\Documents\smb3" />
-
-------
-
-"<filebase />" represents the root assembler file (that is, the file to be passed to NESASM) without any 3 letter extension (i.e. "smb3" means to use "smb3.asm" and generate "smb3.nes")
-
-<filebase value="smb3" />
+game value="C:\Users\Whatever\Documents\smb3"
 
 ------
 
-"<build />" represents the path to the NESASM executable. 
+"filebase" represents the root assembler file (that is, the file to be passed to NESASM) without any 3 letter extension (i.e. "smb3" means to use "smb3.asm" and generate "smb3.nes")
 
-<build value="C:\Users\Whatever\Documents\NoDice\nesasm" />
+filebase value="smb3"
+
+------
+
+"build" represents the path to the NESASM executable. 
+
+build value="C:\Users\Whatever\Documents\NoDice\nesasm"
 
 ------
 

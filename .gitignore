@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/NoDice/v15
+/projects/MSVC/MusConv/Release
+/projects/MSVC/NoDice/Release
+/projects/MSVC/NoDiceLib/Release
+/projects/MSVC/Release
+/Release
+/Debug
+/projects/MSVC

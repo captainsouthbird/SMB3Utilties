@@ -70,6 +70,8 @@ static char path_buffer[PATH_MAX];
 
 #ifndef _WIN32
 
+#if GLIB_MAJOR_VERSION <= 2 && GLIB_MINOR_VERSION < 32
+
 static GCond *run_6502_timeout_thread_cond;
 static GThread *run_6502_timeout_thread_thread;
 static volatile gboolean run_6502_timeout_thread_cond_ack = FALSE;
@@ -131,7 +133,72 @@ void gui_6052_timeout_end()
 	g_cond_free(run_6502_timeout_thread_cond);
 }
 
-#else
+#else		// End old GLIB < 2.32
+
+static GCond run_6502_timeout_thread_cond;
+static GThread *run_6502_timeout_thread_thread;
+static volatile gboolean run_6502_timeout_thread_cond_ack = FALSE;
+
+// Used to run a timeout in case the 6502 freezes
+static gpointer run_6502_timeout_thread(gpointer optr)
+{
+	gint64 time;
+
+	// Required for g_cond_timed_wait, not used
+	GMutex unused_mutex;
+	g_mutex_init(&unused_mutex);
+	
+	g_mutex_lock (&unused_mutex);
+
+	// Sleep until we hit timeout or the condition is signalled
+	time = g_get_monotonic_time() + NoDice_config.core6502_timeout * G_TIME_SPAN_SECOND;
+
+	// g_cond_timed_wait returns FALSE if it timed out
+	// If condition is signalled however (i.e. 6502 core
+	// completed in a timely manner), then we don't do anything.
+	if(g_cond_wait_until(&run_6502_timeout_thread_cond, &unused_mutex, time) == FALSE)
+		// Timeout occurred; assume 6502 is frozen!
+		NoDice_Run6502_Stop = RUN6502_TIMEOUT;
+	else
+		// Acknowledge condition (if that's how we exited)
+		run_6502_timeout_thread_cond_ack = TRUE;
+
+	g_mutex_unlock (&unused_mutex);
+		
+	return NULL;
+}
+
+
+void gui_6502_timeout_start()
+{
+	// Install a timer to check for lockups of the 6502 core
+	run_6502_timeout_thread_cond_ack = FALSE;
+	g_cond_init(&run_6502_timeout_thread_cond);
+	run_6502_timeout_thread_thread = g_thread_new("6502_timeout_thread", run_6502_timeout_thread, NULL);
+}
+
+
+void gui_6052_timeout_end()
+{
+	// If we didn't time out, send the signal
+	if(NoDice_Run6502_Stop != RUN6502_TIMEOUT)
+	{
+		// Repeatedly hit the condition in case it gets missed; this can
+		// happen if the 6502 core runs faster than the setup for g_cond_timed_wait
+		while(!run_6502_timeout_thread_cond_ack)
+		{
+			g_cond_signal(&run_6502_timeout_thread_cond);
+			g_thread_yield();
+		}
+	}
+
+	// Cleanup timeout thread
+	g_thread_join(run_6502_timeout_thread_thread);
+}
+
+#endif		// End newer GLIB
+
+#else	// End Linux
 
 	// For some reason I haven't determined yet, the above precise
 	// timeout loop doesn't work under Windows (it just deadlocks)
@@ -1897,6 +1964,8 @@ static void gui_map_link_properties_clicked(GtkButton *button, gpointer user_dat
 
 void gui_boot(int argc, char *argv[])
 {
+	gdk_threads_init();
+
 	// Initialize GTK+
 	gtk_init (&argc, &argv);
 }
@@ -2158,8 +2227,10 @@ static void gui_create_right_pane(GtkWidget *vbox)
 
 int gui_init()
 {
+#if GLIB_MAJOR_VERSION <= 2 && GLIB_MINOR_VERSION < 32
 	// Initialize threading
 	g_thread_init(NULL);
+#endif
 
 	// Create the main window
 	gui_main_window = gtk_window_new (GTK_WINDOW_TOPLEVEL);

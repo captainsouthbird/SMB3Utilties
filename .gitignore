@@ -10,3 +10,5 @@
 /Release
 /Debug
 /projects/MSVC
+*.o
+*.a

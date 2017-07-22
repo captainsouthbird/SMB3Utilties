@@ -12,3 +12,5 @@
 /projects/MSVC
 *.o
 *.a
+bin/MusConv
+bin/NoDice

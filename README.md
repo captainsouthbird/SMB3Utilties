@@ -1,4 +1,13 @@
 # SMB3Utilties
+
+1/10/2021 NO LONGER SUPPORTED -- I've moved on from SMB3 for quite a while and have no interest in maintaining these tools, which by and large are hitting "needs total rewrite" stage. 
+
+NoDice -- uses GTK+ 2 which is way out of date, modern UI toolkit recommended
+
+MusConv -- this was a miserable tool even when I used it, it definitely was only "barely good enough" to get the job done
+
+------
+
 NoDice level editor and MusConv utility supporting my specific disassemblies. If you are running Windows, and you have no specific reason to build from source, you probably just want to use a prebuilt release version.
 
 Windows users: You MUST install the GTK+ 2.24 runtime, available here: https://sourceforge.net/projects/gtk-win/
